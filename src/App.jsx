@@ -13,6 +13,8 @@ import {
   Users,
   Layers,
   Send,
+  Mail,
+  ShieldCheck,
   Instagram,
   Facebook,
   Navigation,
@@ -93,6 +95,13 @@ export default function App() {
   // Formulário de Contato / Agendamento
   const [contato, setContato] = useState({ nome: '', telefone: '', tipo: 'Entrega de Doação', mensagem: '' });
   const [contatoEnviado, setContatoEnviado] = useState(false);
+  const [consentimento, setConsentimento] = useState(false);
+  const [linksContato, setLinksContato] = useState({ whats: '', email: '' });
+  const [copiadoContato, setCopiadoContato] = useState(false);
+
+  // Contato oficial do Lar (WhatsApp Business / telefone institucional)
+  const WHATS_LAR = '557436214215';
+  const EMAIL_LAR = 'cruzadadobem@gmail.com';
 
   const registrarDoacao = (id) => {
     setItens((prev) =>
@@ -120,11 +129,41 @@ export default function App() {
 
   const enviarContato = (e) => {
     e.preventDefault();
+    if (!consentimento) return;
+
+    const texto = [
+      'Contato pelo portal DoeFácil Jacobina',
+      '',
+      `Nome: ${contato.nome}`,
+      `Telefone: ${contato.telefone}`,
+      `Assunto: ${contato.tipo}`,
+      '',
+      `Mensagem: ${contato.mensagem}`
+    ].join('\n');
+
+    const whats = `https://wa.me/${WHATS_LAR}?text=${encodeURIComponent(texto)}`;
+    const email = `mailto:${EMAIL_LAR}?subject=${encodeURIComponent(
+      `DoeFácil — ${contato.tipo}`
+    )}&body=${encodeURIComponent(texto)}`;
+
+    setLinksContato({ whats, email });
     setContatoEnviado(true);
-    setTimeout(() => {
-      setContatoEnviado(false);
-      setContato({ nome: '', telefone: '', tipo: 'Entrega de Doação', mensagem: '' });
-    }, 4000);
+    window.open(whats, '_blank');
+  };
+
+  const fecharContato = () => {
+    setContatoEnviado(false);
+    setConsentimento(false);
+    setCopiadoContato(false);
+    setLinksContato({ whats: '', email: '' });
+    setContato({ nome: '', telefone: '', tipo: 'Entrega de Doação', mensagem: '' });
+  };
+
+  const copiarMensagemContato = () => {
+    const texto = linksContato.whats.split('text=')[1] || '';
+    navigator.clipboard.writeText(decodeURIComponent(texto));
+    setCopiadoContato(true);
+    setTimeout(() => setCopiadoContato(false), 3000);
   };
 
   const copiarPix = () => {
@@ -671,12 +710,50 @@ export default function App() {
             </p>
 
             {contatoEnviado ? (
-              <div className="mt-6 p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 flex items-center gap-3">
-                <CheckCircle2 className="w-6 h-6 shrink-0" />
-                <div>
-                  <strong>Solicitação registrada com sucesso!</strong>
-                  <p className="text-sm">A equipe do Lar do Idoso Cruzada do Bem recebeu sua mensagem.</p>
+              <div className="mt-6 p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800">
+                <div className="flex items-start gap-3">
+                  <CheckCircle2 className="w-6 h-6 shrink-0 mt-0.5" />
+                  <div>
+                    <strong>Mensagem pronta para envio!</strong>
+                    <p className="text-sm mt-0.5">
+                      Abrimos o WhatsApp do Lar com seu texto — é só tocar em enviar por lá.
+                      Se preferir, envie pelo e-mail oficial ou copie a mensagem.
+                    </p>
+                  </div>
                 </div>
+
+                <div className="flex flex-wrap gap-2 mt-4">
+                  <a
+                    href={linksContato.whats}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="px-3.5 py-2 rounded-xl bg-emerald-600 text-white text-xs font-semibold inline-flex items-center gap-2 hover:bg-emerald-700"
+                  >
+                    <MessageSquare className="w-4 h-4" /> Abrir WhatsApp
+                  </a>
+                  <a
+                    href={linksContato.email}
+                    className="px-3.5 py-2 rounded-xl bg-white border border-emerald-300 text-emerald-800 text-xs font-semibold inline-flex items-center gap-2 hover:bg-emerald-100"
+                  >
+                    <Mail className="w-4 h-4" /> Enviar por e-mail
+                  </a>
+                  <button
+                    type="button"
+                    onClick={copiarMensagemContato}
+                    className="px-3.5 py-2 rounded-xl bg-white border border-emerald-300 text-emerald-800 text-xs font-semibold inline-flex items-center gap-2 hover:bg-emerald-100"
+                  >
+                    {copiadoContato ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                    {copiadoContato ? 'Copiada!' : 'Copiar mensagem'}
+                  </button>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={fecharContato}
+                  className="mt-4 text-xs text-emerald-700 underline hover:text-emerald-900"
+                >
+                  Enviar outra mensagem
+                </button>
               </div>
             ) : (
               <form onSubmit={enviarContato} className="mt-6 space-y-4">
@@ -728,11 +805,26 @@ export default function App() {
                     placeholder="Descreva os itens que deseja doar ou o melhor horário..."
                   />
                 </div>
+
+                <label className="flex items-start gap-2.5 text-xs text-slate-600 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    required
+                    checked={consentimento}
+                    onChange={(e) => setConsentimento(e.target.checked)}
+                    className="mt-0.5 h-4 w-4 accent-emerald-600 shrink-0"
+                  />
+                  <span>
+                    Autorizo o uso dos dados informados <strong>somente</strong> para o retorno deste
+                    contato, conforme a LGPD. Este site não armazena nem compartilha seus dados.
+                  </span>
+                </label>
+
                 <button
                   type="submit"
                   className="w-full py-3 rounded-xl bg-emerald-600 text-white font-semibold text-sm hover:bg-emerald-700 flex items-center justify-center gap-2"
                 >
-                  <MessageSquare className="w-4 h-4" /> Enviar Mensagem
+                  <MessageSquare className="w-4 h-4" /> Enviar via WhatsApp
                 </button>
               </form>
             )}
