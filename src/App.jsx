@@ -8,19 +8,22 @@ import {
   Share2,
   MessageSquare,
   CheckCircle2,
-  AlertTriangle,
   Users,
   Layers,
   Send,
   Instagram,
   Facebook,
   Navigation,
-  Sparkles
+  Sparkles,
+  Globe,
+  Copy,
+  Check
 } from 'lucide-react';
 
 export default function App() {
   const [fidelidade, setFidelidade] = useState('alta'); // 'baixa' | 'alta'
   const [abaAtiva, setAbaAtiva] = useState('campanhas');
+  const [pixCopiado, setPixCopiado] = useState(false);
 
   // Estado dos itens urgentes (Coordenação + Mecanismo de Percepção M3C)
   const [itens, setItens] = useState([
@@ -118,30 +121,58 @@ export default function App() {
     }, 4000);
   };
 
+  const copiarPix = () => {
+    navigator.clipboard.writeText('cruzadadobem@gmai.com');
+    setPixCopiado(true);
+    setTimeout(() => setPixCopiado(false), 3000);
+  };
+
   const compartilharWhatsApp = () => {
     const texto = encodeURIComponent(
-      'Olá! Conheça o DoeFácil Jacobina e ajude o Lar do Idoso Cruzada do Bem (Rua da Fraternidade, 254 - Félix Tomaz). Veja os itens mais urgentes no portal!'
+      'Olá! Conheça o DoeFácil Jacobina e ajude o Lar do Idoso Cruzada do Bem (Rua da Fraternidade, 254 - Félix Tomaz). Veja os itens mais urgentes no portal: https://doefacil-jacobina.vercel.app/'
     );
     window.open(`https://wa.me/?text=${texto}`, '_blank');
   };
 
   const isLowFi = fidelidade === 'baixa';
 
+  // Fotos reais extraídas da página institucional do Lar do Idoso Cruzada do Bem
   const galeriaFotos = [
     {
-      titulo: 'Recebimento de Fraldas e Higiene',
-      descricao: 'Campanha comunitária realizada pelos moradores do bairro Félix Tomaz.',
-      cor: 'bg-emerald-100 text-emerald-800'
+      titulo: 'Desfile de 7 de Setembro em Jacobina',
+      descricao: 'Participação especial dos residentes e equipe do Lar do Idoso Cruzada do Bem nas celebrações cívicas da cidade.',
+      imagem: 'https://sites.google.com/sitesv-images-rt/APXyLQcyiPDCnFGSmrZE8drefiM8ATPc9TxKiZ0TLy_G4e4B0BIVPhM-IvFOONXlxW1NT7nM_EUf69Gne87HTsvxmjAGsQIh4KzgP8hIhxEEj_gBN8wlbs6Do4VZg1rGpstdG3elNo7f_c_dH9lvr-1Dl8po-GpR57FZzeNHP1yCyqCb8v1eIXJxQ8NO2Okio7Ois-cOOZxd7fmXNuDV3MPMzNkJkYJLRGTCPgASEBIj=w1280',
+      data: 'Setembro/2025'
     },
     {
-      titulo: 'Tarde Musical com Voluntários',
-      descricao: 'Apresentação cultural e convivência com os residentes do Lar.',
-      cor: 'bg-amber-100 text-amber-800'
+      titulo: 'Visita do Clube da Fraternidade',
+      descricao: 'Momento de confraternização, apoio comunitário e entrega de doações realizada pelo Clube da Fraternidade.',
+      imagem: 'https://sites.google.com/sitesv-images-rt/APXyLQfg2P0EozimrjBEaZh5zJu5uV2-RYA-70O70_KBkVLVRMGlYpw7WIPs0zKXPHt6ZV5lggoWU1NVCXV7yMc07FNjIsVZW8tCHlZE0PUcPsKGCNLDbkGTIWeZN6nK7rgVoDX66je-txO2DHToqkYxUs-mbaKbiuMXb5KY-ggrQrIgvWDlvvCIkqHEj_k0Iuf97U1PKIjxXLupBSs80CP-N6G5OozTJMKeRfNT3GFP0R8=w1280',
+      data: 'Setembro/2025'
     },
     {
-      titulo: 'Abastecimento da Despensa',
-      descricao: 'Organização semanal dos alimentos não perecíveis doados.',
-      cor: 'bg-sky-100 text-sky-800'
+      titulo: 'Projeto de Mobilidade e Dança',
+      descricao: 'Atividades físicas, expressão corporal e estímulo motor promovidos com os idosos acolhidos pela instituição.',
+      imagem: 'https://sites.google.com/sitesv-images-rt/APXyLQdUgmSp4kgky2uht20nF33XIs8mOjY6BU01_Y7RBtiSdq0ELHn4Z0aPUUAXwA9tUbuOqRc8snFgKnqyFR9gr4bkwc7oKModkda5H_SQoDpDG4p0E9H1Zco_hAk6cZzKcTZmN7prEeo1N8s6zCzWzn62Ttx1sZQezl3QumEjwqqVBNX7QZBbut8nWWrVtlGaKBsWF3OVFxhU8WfLpYUtIeUQo3V2eS5Rrx7BaKU9=w1280',
+      data: 'Setembro/2025'
+    },
+    {
+      titulo: 'Visita dos Estudantes do CETEP Piemonte da Diamantina II',
+      descricao: 'Integração intergeracional e ações solidárias desenvolvidas pelos estudantes de Jacobina junto aos moradores.',
+      imagem: 'https://sites.google.com/sitesv-images-rt/APXyLQdaXmlVo3BYBO0EGJRE6vZfbQVIAf51-HDu4ENDX-RymMF5RJOTtpMOTbuULX6XSYtEovD8E_Dypn2m0kQSdZeg5_GySGhpbcxD5rvORj7zQKaRjLmZH4PPVk9AKK4m-nzMy5Yu-l6jS-9lS1hFXPYKsxdJfcYIT2kZCAA6LPBCZnc6NnolZB5D8zFLKZd0WTvkidOlbZDJsgREzeosvT_o7ySkbOHi8pEfdCnn0RE=w1280',
+      data: 'Outubro/2025'
+    },
+    {
+      titulo: 'Oficina de Mobilidade com Ivan',
+      descricao: 'Acompanhamento funcional e exercícios de bem-estar realizados na área de convivência do Lar.',
+      imagem: 'https://sites.google.com/sitesv-images-rt/APXyLQdw8SzfW2Ubf7O0Cbg-zCTt6fKZ9huxvOwHFgicYmty0BuQTy5k88AMkbYq7VYx0xIftbkfxzMTtpfZPYTWhd3UDFRTJJL3Axo9Cs92WPVqk6LCsYkFZvihXDqWSUDCsjiowoJStZoiMveZgpZDyRrVTlcmQfy4eBYdVKDt5vX0OM3ZyUWXM6ojQ2Ip98uFoWiExSBL3UItxBV5UACIN9NabSsOcsSVvFBnrV0_tco=w1280',
+      data: 'Outubro/2025'
+    },
+    {
+      titulo: 'Oficina de Artesanato e Expressão Corporal',
+      descricao: 'Atividades artísticas e terapêuticas que fortalecem a autonomia, memória e alegria dos residentes.',
+      imagem: 'https://sites.google.com/sitesv-images-rt/APXyLQco7vfAfk_6gSUqp5KdpTEg6zgd-NkctyCefDKqhwxeI8_-L0hKtUdUtQX0Bt-VvMr0gDSlur5KIZr_aA7Scuw2-BpL3DxrAqemoNLfnjG0nY2ZgKnH0PQhYF7OcYItWZZzVJ6dtvEut5zTGWIDlzrqj3Ikvvza8n_KrPlaj1DULekQ_7n5PIvjfiNTqmdMfjZwPyX1navJYaWxrq_3AlKh-yDHiYkwKo6j7iFdcmI=w1280',
+      data: 'Outubro/2025'
     }
   ];
 
@@ -198,7 +229,7 @@ export default function App() {
             </div>
           </div>
 
-          {/* Navegação Principal (Heurística de Visibilidade e Controle do Usuário) */}
+          {/* Navegação Principal */}
           <nav className="mt-6 flex flex-wrap gap-2 border-t border-white/15 pt-4">
             {[
               { id: 'campanhas', label: 'Necessidades & Metas' },
@@ -232,6 +263,24 @@ export default function App() {
         {/* ABA 1: COOPERAÇÃO E COORDENAÇÃO (NECESSIDADES EM TEMPO REAL) */}
         {abaAtiva === 'campanhas' && (
           <section className="space-y-6">
+            {/* Banner Pix Oficial */}
+            <div className={`p-4 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${isLowFi ? 'bg-white border-2 border-gray-800' : 'bg-emerald-900 text-white shadow-sm'}`}>
+              <div>
+                <span className="text-xs uppercase tracking-wider font-semibold opacity-80">Doação Financeira Direta (Chave Pix Oficial)</span>
+                <p className="text-base font-bold mt-0.5">cruzadadobem@gmai.com</p>
+                <p className="text-xs opacity-80">Lar do Idoso Cruzada do Bem • Jacobina - BA</p>
+              </div>
+              <button
+                onClick={copiarPix}
+                className={`px-4 py-2 rounded-xl text-sm font-semibold inline-flex items-center gap-2 shrink-0 ${
+                  isLowFi ? 'bg-gray-900 text-white' : 'bg-emerald-500 text-slate-950 hover:bg-emerald-400'
+                }`}
+              >
+                {pixCopiado ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                {pixCopiado ? 'Chave Copiada!' : 'Copiar Chave Pix'}
+              </button>
+            </div>
+
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <div>
                 <h2 className="text-xl font-bold">Itens Prioritários da Semana</h2>
@@ -395,12 +444,20 @@ export default function App() {
                 </div>
               </div>
 
-              <div className="pt-3 border-t border-slate-100 flex flex-wrap gap-3">
+              <div className="pt-3 border-t border-slate-100 flex flex-wrap gap-2.5">
+                <a
+                  href="https://sites.google.com/view/lar-do-idosocruzada-do-bem/inicio"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-emerald-50 text-emerald-800 text-xs font-semibold hover:bg-emerald-100"
+                >
+                  <Globe className="w-4 h-4" /> Portal Oficial (Google Sites)
+                </a>
                 <a
                   href="https://www.instagram.com/lardoidoso_cruzadadobem/"
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-pink-50 text-pink-700 text-sm font-semibold hover:bg-pink-100"
+                  className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-pink-50 text-pink-700 text-xs font-semibold hover:bg-pink-100"
                 >
                   <Instagram className="w-4 h-4" /> Instagram Oficial
                 </a>
@@ -408,7 +465,7 @@ export default function App() {
                   href="https://www.facebook.com/lardoidosocruzadadobem1962/?locale=pt_BR"
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-50 text-blue-700 text-sm font-semibold hover:bg-blue-100"
+                  className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-blue-50 text-blue-700 text-xs font-semibold hover:bg-blue-100"
                 >
                   <Facebook className="w-4 h-4" /> Facebook Oficial
                 </a>
@@ -443,26 +500,52 @@ export default function App() {
           </section>
         )}
 
-        {/* ABA 4: GALERIA DE TRANSPARÊNCIA */}
+        {/* ABA 4: GALERIA DE TRANSPARÊNCIA COM FOTOS REAIS DA INSTITUIÇÃO */}
         {abaAtiva === 'galeria' && (
           <section className="space-y-6">
-            <div>
-              <h2 className="text-xl font-bold">Galeria de Ações e Transparência</h2>
-              <p className="text-sm text-slate-600">
-                Prestação de contas visual das campanhas, entregas e atividades voluntárias no Lar.
-              </p>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <h2 className="text-xl font-bold">Galeria de Ações e Transparência</h2>
+                <p className="text-sm text-slate-600">
+                  Registros reais das atividades, oficinas e visitas comunitárias no Lar do Idoso Cruzada do Bem.
+                </p>
+              </div>
+              <a
+                href="https://sites.google.com/view/lar-do-idosocruzada-do-bem/blog"
+                target="_blank"
+                rel="noreferrer"
+                className="text-xs font-semibold text-emerald-700 hover:underline inline-flex items-center gap-1"
+              >
+                Ver blog institucional completo <Globe className="w-3.5 h-3.5" />
+              </a>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
               {galeriaFotos.map((foto, idx) => (
-                <div key={idx} className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
-                  <div className={`h-40 flex flex-col items-center justify-center p-4 ${foto.cor}`}>
-                    <Camera className="w-10 h-10 mb-2 opacity-80" />
-                    <span className="text-xs font-bold uppercase tracking-wider">Registro Comunitário #{idx + 1}</span>
+                <div key={idx} className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm flex flex-col">
+                  <div className="relative h-48 bg-slate-100 overflow-hidden">
+                    {isLowFi ? (
+                      <div className="w-full h-full flex flex-col items-center justify-center border-b-2 border-dashed border-gray-400 text-gray-600">
+                        <Camera className="w-8 h-8 mb-1" />
+                        <span className="text-xs">[Imagem #{idx + 1}]</span>
+                      </div>
+                    ) : (
+                      <img
+                        src={foto.imagem}
+                        alt={foto.titulo}
+                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                        loading="lazy"
+                      />
+                    )}
+                    <span className="absolute top-2 right-2 bg-slate-900/75 text-white text-[11px] font-medium px-2.5 py-0.5 rounded-full">
+                      {foto.data}
+                    </span>
                   </div>
-                  <div className="p-4">
-                    <h3 className="font-bold text-base">{foto.titulo}</h3>
-                    <p className="text-sm text-slate-600 mt-1">{foto.descricao}</p>
+                  <div className="p-4 flex-1 flex flex-col justify-between">
+                    <div>
+                      <h3 className="font-bold text-base leading-snug">{foto.titulo}</h3>
+                      <p className="text-sm text-slate-600 mt-1.5">{foto.descricao}</p>
+                    </div>
                   </div>
                 </div>
               ))}
