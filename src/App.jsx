@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   HeartHandshake,
   MapPin,
   Phone,
   Clock,
   Camera,
+  ChevronLeft,
+  ChevronRight,
   Share2,
   MessageSquare,
   CheckCircle2,
@@ -24,6 +26,10 @@ export default function App() {
   const [fidelidade, setFidelidade] = useState('alta'); // 'baixa' | 'alta'
   const [abaAtiva, setAbaAtiva] = useState('campanhas');
   const [pixCopiado, setPixCopiado] = useState(false);
+
+  // Slideshow de transparência (aba inicial)
+  const [slideAtual, setSlideAtual] = useState(0);
+  const [pausado, setPausado] = useState(false);
 
   // Estado dos itens urgentes (Coordenação + Mecanismo de Percepção M3C)
   const [itens, setItens] = useState([
@@ -122,7 +128,7 @@ export default function App() {
   };
 
   const copiarPix = () => {
-    navigator.clipboard.writeText('cruzadadobem@gmai.com');
+    navigator.clipboard.writeText('cruzadadobem@gmail.com');
     setPixCopiado(true);
     setTimeout(() => setPixCopiado(false), 3000);
   };
@@ -136,45 +142,59 @@ export default function App() {
 
   const isLowFi = fidelidade === 'baixa';
 
-  // Fotos reais extraídas da página institucional do Lar do Idoso Cruzada do Bem
+  // Fotos reais da página institucional, hospedadas localmente em public/galeria/
   const galeriaFotos = [
     {
       titulo: 'Desfile de 7 de Setembro em Jacobina',
       descricao: 'Participação especial dos residentes e equipe do Lar do Idoso Cruzada do Bem nas celebrações cívicas da cidade.',
-      imagem: 'https://sites.google.com/sitesv-images-rt/APXyLQcyiPDCnFGSmrZE8drefiM8ATPc9TxKiZ0TLy_G4e4B0BIVPhM-IvFOONXlxW1NT7nM_EUf69Gne87HTsvxmjAGsQIh4KzgP8hIhxEEj_gBN8wlbs6Do4VZg1rGpstdG3elNo7f_c_dH9lvr-1Dl8po-GpR57FZzeNHP1yCyqCb8v1eIXJxQ8NO2Okio7Ois-cOOZxd7fmXNuDV3MPMzNkJkYJLRGTCPgASEBIj=w1280',
+      imagem: '/galeria/01-desfile-7-setembro.jpg',
       data: 'Setembro/2025'
     },
     {
       titulo: 'Visita do Clube da Fraternidade',
       descricao: 'Momento de confraternização, apoio comunitário e entrega de doações realizada pelo Clube da Fraternidade.',
-      imagem: 'https://sites.google.com/sitesv-images-rt/APXyLQfg2P0EozimrjBEaZh5zJu5uV2-RYA-70O70_KBkVLVRMGlYpw7WIPs0zKXPHt6ZV5lggoWU1NVCXV7yMc07FNjIsVZW8tCHlZE0PUcPsKGCNLDbkGTIWeZN6nK7rgVoDX66je-txO2DHToqkYxUs-mbaKbiuMXb5KY-ggrQrIgvWDlvvCIkqHEj_k0Iuf97U1PKIjxXLupBSs80CP-N6G5OozTJMKeRfNT3GFP0R8=w1280',
+      imagem: '/galeria/02-clube-da-fraternidade.jpg',
       data: 'Setembro/2025'
     },
     {
       titulo: 'Projeto de Mobilidade e Dança',
       descricao: 'Atividades físicas, expressão corporal e estímulo motor promovidos com os idosos acolhidos pela instituição.',
-      imagem: 'https://sites.google.com/sitesv-images-rt/APXyLQdUgmSp4kgky2uht20nF33XIs8mOjY6BU01_Y7RBtiSdq0ELHn4Z0aPUUAXwA9tUbuOqRc8snFgKnqyFR9gr4bkwc7oKModkda5H_SQoDpDG4p0E9H1Zco_hAk6cZzKcTZmN7prEeo1N8s6zCzWzn62Ttx1sZQezl3QumEjwqqVBNX7QZBbut8nWWrVtlGaKBsWF3OVFxhU8WfLpYUtIeUQo3V2eS5Rrx7BaKU9=w1280',
+      imagem: '/galeria/03-projeto-mobilidade-danca.jpg',
       data: 'Setembro/2025'
     },
     {
       titulo: 'Visita dos Estudantes do CETEP Piemonte da Diamantina II',
       descricao: 'Integração intergeracional e ações solidárias desenvolvidas pelos estudantes de Jacobina junto aos moradores.',
-      imagem: 'https://sites.google.com/sitesv-images-rt/APXyLQdaXmlVo3BYBO0EGJRE6vZfbQVIAf51-HDu4ENDX-RymMF5RJOTtpMOTbuULX6XSYtEovD8E_Dypn2m0kQSdZeg5_GySGhpbcxD5rvORj7zQKaRjLmZH4PPVk9AKK4m-nzMy5Yu-l6jS-9lS1hFXPYKsxdJfcYIT2kZCAA6LPBCZnc6NnolZB5D8zFLKZd0WTvkidOlbZDJsgREzeosvT_o7ySkbOHi8pEfdCnn0RE=w1280',
+      imagem: '/galeria/04-cetep-piemonte-diamantina.jpg',
       data: 'Outubro/2025'
     },
     {
       titulo: 'Oficina de Mobilidade com Ivan',
       descricao: 'Acompanhamento funcional e exercícios de bem-estar realizados na área de convivência do Lar.',
-      imagem: 'https://sites.google.com/sitesv-images-rt/APXyLQdw8SzfW2Ubf7O0Cbg-zCTt6fKZ9huxvOwHFgicYmty0BuQTy5k88AMkbYq7VYx0xIftbkfxzMTtpfZPYTWhd3UDFRTJJL3Axo9Cs92WPVqk6LCsYkFZvihXDqWSUDCsjiowoJStZoiMveZgpZDyRrVTlcmQfy4eBYdVKDt5vX0OM3ZyUWXM6ojQ2Ip98uFoWiExSBL3UItxBV5UACIN9NabSsOcsSVvFBnrV0_tco=w1280',
+      imagem: '/galeria/05-oficina-mobilidade-ivan.jpg',
       data: 'Outubro/2025'
     },
     {
       titulo: 'Oficina de Artesanato e Expressão Corporal',
       descricao: 'Atividades artísticas e terapêuticas que fortalecem a autonomia, memória e alegria dos residentes.',
-      imagem: 'https://sites.google.com/sitesv-images-rt/APXyLQco7vfAfk_6gSUqp5KdpTEg6zgd-NkctyCefDKqhwxeI8_-L0hKtUdUtQX0Bt-VvMr0gDSlur5KIZr_aA7Scuw2-BpL3DxrAqemoNLfnjG0nY2ZgKnH0PQhYF7OcYItWZZzVJ6dtvEut5zTGWIDlzrqj3Ikvvza8n_KrPlaj1DULekQ_7n5PIvjfiNTqmdMfjZwPyX1navJYaWxrq_3AlKh-yDHiYkwKo6j7iFdcmI=w1280',
+      imagem: '/galeria/06-artesanato-expressao-corporal.jpg',
       data: 'Outubro/2025'
     }
   ];
+
+  const totalSlides = galeriaFotos.length;
+
+  useEffect(() => {
+    if (isLowFi || pausado || totalSlides === 0) return;
+    const timer = setInterval(() => {
+      setSlideAtual((atual) => (atual + 1) % totalSlides);
+    }, 6000);
+    return () => clearInterval(timer);
+  }, [isLowFi, pausado, totalSlides]);
+
+  const irParaSlide = (indice) => {
+    setSlideAtual(((indice % totalSlides) + totalSlides) % totalSlides);
+  };
 
   return (
     <div className={`min-h-screen transition-colors ${isLowFi ? 'bg-gray-100 font-mono text-gray-900' : 'bg-slate-50 text-slate-800'}`}>
@@ -267,7 +287,7 @@ export default function App() {
             <div className={`p-4 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${isLowFi ? 'bg-white border-2 border-gray-800' : 'bg-emerald-900 text-white shadow-sm'}`}>
               <div>
                 <span className="text-xs uppercase tracking-wider font-semibold opacity-80">Doação Financeira Direta (Chave Pix Oficial)</span>
-                <p className="text-base font-bold mt-0.5">cruzadadobem@gmai.com</p>
+                <p className="text-base font-bold mt-0.5">cruzadadobem@gmail.com</p>
                 <p className="text-xs opacity-80">Lar do Idoso Cruzada do Bem • Jacobina - BA</p>
               </div>
               <button
@@ -279,6 +299,95 @@ export default function App() {
                 {pixCopiado ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                 {pixCopiado ? 'Chave Copiada!' : 'Copiar Chave Pix'}
               </button>
+            </div>
+
+            {/* Slideshow de Transparência (logo abaixo da doação financeira) */}
+            <div>
+              <div className="flex items-center justify-between gap-2 mb-2">
+                <span className="text-xs uppercase tracking-wider font-semibold text-slate-500">
+                  Ações do Lar em Destaque
+                </span>
+                <button
+                  onClick={() => setAbaAtiva('galeria')}
+                  className="text-xs font-semibold text-emerald-700 hover:underline"
+                >
+                  Ver galeria completa
+                </button>
+              </div>
+
+              <div
+                onMouseEnter={() => setPausado(true)}
+                onMouseLeave={() => setPausado(false)}
+                className={`overflow-hidden rounded-2xl ${
+                  isLowFi ? 'border-2 border-gray-800 bg-white' : 'border border-slate-200 bg-white shadow-sm'
+                }`}
+              >
+                <div className={`relative h-56 sm:h-72 ${isLowFi ? 'bg-gray-100' : 'bg-slate-900'}`}>
+                  {isLowFi ? (
+                    <div className="w-full h-full flex flex-col items-center justify-center text-gray-600">
+                      <Camera className="w-8 h-8 mb-1" />
+                      <span className="text-xs font-mono">
+                        [Slideshow #{slideAtual + 1} de {totalSlides}]
+                      </span>
+                    </div>
+                  ) : (
+                    <>
+                      {galeriaFotos.map((foto, idx) => (
+                        <img
+                          key={foto.imagem}
+                          src={foto.imagem}
+                          alt={foto.titulo}
+                          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-[1800ms] ease-[cubic-bezier(0.45,0,0.55,1)] ${
+                            idx === slideAtual ? 'opacity-100' : 'opacity-0'
+                          }`}
+                        />
+                      ))}
+
+                      <button
+                        onClick={() => irParaSlide(slideAtual - 1)}
+                        aria-label="Foto anterior"
+                        className="absolute left-2 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-slate-900/50 text-white hover:bg-slate-900/75 transition"
+                      >
+                        <ChevronLeft className="w-5 h-5" />
+                      </button>
+                      <button
+                        onClick={() => irParaSlide(slideAtual + 1)}
+                        aria-label="Próxima foto"
+                        className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-slate-900/50 text-white hover:bg-slate-900/75 transition"
+                      >
+                        <ChevronRight className="w-5 h-5" />
+                      </button>
+
+                      <span className="absolute top-2 right-2 bg-slate-900/75 text-white text-[11px] font-medium px-2.5 py-0.5 rounded-full">
+                        {galeriaFotos[slideAtual].data}
+                      </span>
+                    </>
+                  )}
+                </div>
+
+                {!isLowFi && (
+                  <div className="flex items-center justify-between gap-3 px-4 py-3">
+                    <div className="min-w-0">
+                      <p className="text-sm font-bold truncate">{galeriaFotos[slideAtual].titulo}</p>
+                      <p className="text-xs text-slate-600 truncate">
+                        {galeriaFotos[slideAtual].descricao}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      {galeriaFotos.map((foto, idx) => (
+                        <button
+                          key={foto.imagem}
+                          onClick={() => irParaSlide(idx)}
+                          aria-label={`Ir para foto ${idx + 1}`}
+                          className={`h-2 rounded-full transition-all ${
+                            idx === slideAtual ? 'w-5 bg-emerald-600' : 'w-2 bg-slate-300 hover:bg-slate-400'
+                          }`}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
@@ -633,7 +742,7 @@ export default function App() {
 
       {/* Rodapé */}
       <footer className="border-t border-slate-200 bg-white mt-12 py-6 text-center text-xs text-slate-500">
-        <p>DoeFácil Jacobina • Projeto de Extensão Universitária (ODS 1 — Erradicação da Pobreza)</p>
+        <p>Todos os direitos reservados</p>
         <p className="mt-1">Lar do Idoso Cruzada do Bem • Rua da Fraternidade, 254, Jacobina - BA</p>
       </footer>
     </div>
